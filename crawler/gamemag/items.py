@@ -1,6 +1,6 @@
 import scrapy
 
-class GamemagItem(scrapy.Item):
+class ReviewItem(scrapy.Item):
     valuation = scrapy.Field()
     title = scrapy.Field()
     description = scrapy.Field()
@@ -19,6 +19,27 @@ class GamemagItem(scrapy.Item):
     theme = scrapy.Field()
     duration = scrapy.Field()
     score = scrapy.Field()
+    laugh = scrapy.Field()
+    joy = scrapy.Field()
+    disgust = scrapy.Field()
+    surprise = scrapy.Field()
+    anger = scrapy.Field()
+    bitterness = scrapy.Field()
+    interest = scrapy.Field()
+    poker = scrapy.Field()
+
+class NewsItem(scrapy.Item):
+    valuation = scrapy.Field()
+    title = scrapy.Field()
+    authors = scrapy.Field()
+    date = scrapy.Field()
+    comments = scrapy.Field()
+    visual_overview = scrapy.Field()
+    platforms = scrapy.Field()
+    categories = scrapy.Field()
+    tags = scrapy.Field()
+    website = scrapy.Field()
+    text = scrapy.Field()
     laugh = scrapy.Field()
     joy = scrapy.Field()
     disgust = scrapy.Field()
