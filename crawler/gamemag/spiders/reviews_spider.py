@@ -1,10 +1,10 @@
 import re
 from datetime import datetime
 from scrapy import Request, Spider
-from gamemag.items import GamemagItem
+from gamemag.items import ReviewItem
 from urllib.parse import urljoin
 
-class HelpMyCash(Spider):
+class ReviewsSpider(Spider):
     name = "reviews"
     allowed_domains = ["gamemag.ru"]
     start_urls = ['https://gamemag.ru/reviews']
@@ -21,7 +21,7 @@ class HelpMyCash(Spider):
             yield Request(url=review_url, callback=self.parse_review)
 
     def parse_review(self, response):
-        item = GamemagItem()
+        item = ReviewItem()
         overview = response.xpath('//div[@class="overview"]')
         item['valuation'] = int(overview.xpath('span/text()').extract_first() or 0)
         item['title'] = overview.xpath('div[3]/h1/text()').extract_first()[6:]
@@ -47,7 +47,7 @@ class HelpMyCash(Spider):
             text = HTML_RE.sub('', '\n'.join([item.strip() 
                     for item in response.xpath('//div[@class="content-text"]/div/text()|//div[@class="content-text"]/p|strong').extract()
                     if item.strip() and len(item) > 1]))
-        item['text'] = text
+        item['text'] = text.replace('\xa0', ' ')
         item['screenshots'] = len(response.xpath('//div[@id="gallery"]/img').extract())
         
         evaluation = response.xpath('//section[@class="evaluation-of-game"]/div')
