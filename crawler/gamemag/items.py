@@ -13,6 +13,7 @@ class ReviewItem(scrapy.Item):
     developers = scrapy.Field()
     publishers = scrapy.Field()
     genres = scrapy.Field()
+    verdict = scrapy.Field()
     text = scrapy.Field()
     screenshots = scrapy.Field()
     passed_on = scrapy.Field()
@@ -27,6 +28,7 @@ class ReviewItem(scrapy.Item):
     bitterness = scrapy.Field()
     interest = scrapy.Field()
     poker = scrapy.Field()
+    url = scrapy.Field()
 
 class NewsItem(scrapy.Item):
     valuation = scrapy.Field()

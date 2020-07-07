@@ -40,14 +40,42 @@ class ReviewsSpider(Spider):
         item['genres'] = '\n'.join([item.strip() for item in about.xpath('div[4]/p/a/text()').extract()])
         
         HTML_RE = re.compile(r'<[^>]+>')
-        text = HTML_RE.sub('', '\n'.join([item.strip() 
-                for item in response.xpath('//div[contains(@class, "content-text")]/p|strong').extract()
-                if item.strip() and len(item) > 1]))
-        if len(text) < 50:
-            text = HTML_RE.sub('', '\n'.join([item.strip() 
-                    for item in response.xpath('//div[@class="content-text"]/div/text()|//div[@class="content-text"]/p|strong').extract()
-                    if item.strip() and len(item) > 1]))
-        item['text'] = text.replace('\xa0', ' ')
+        paragraphs = list(filter(lambda x: x.strip() and not x.startswith(("Тестировалась версия для",
+                                                                           "Версия для",
+                                                                           "Автор -",
+                                                                           " Автор -",
+                                                                           "Автор –",
+                                                                           "АВТОР –",
+                                                                           "АВТОР -",
+                                                                           "Автор:",
+                                                                           "Автор обзора -",
+                                                                           "Авторы -",
+                                                                           "Редактор -",
+                                                                           "Обзор на дополнения:",
+                                                                           "***",
+                                                                           "Игра пройдена на")),
+                                            [HTML_RE.sub('', item.strip().replace('\n', '')
+                                                                         .replace('\r', '')
+                                                                         .replace('\xa0', ' ')
+                                                                         .replace('�', ' ')
+                                                                         .replace('&amp;', '&')
+                                                                         .replace('\xad', '')) 
+                                            for item in [i for item in response.xpath('//div[contains(@class, "content-text")]').xpath('p|div').extract() 
+                                            for i in item.replace('</div>\n<div>', '<br>').split('<br>')]
+                                            if "Style Definitions" not in item
+                                                and "MicrosoftInternetExplorer4" not in item]))
+        if item['title'] == "Halo: The Master Chief Collection":
+            item['verdict'] = paragraphs[-14]
+            item['text'] = '\n'.join(paragraphs[:-13])
+        elif item['title'] == "Hyper Light Drifter":
+            item['verdict'] = paragraphs[-5]
+            item['text'] = '\n'.join(paragraphs[:-4])
+        elif item['title'] == "Pollen":
+            item['verdict'] = paragraphs[-4]
+            item['text'] = '\n'.join(paragraphs[:-3])            
+        else:
+            item['verdict'] = paragraphs[-1] if len(paragraphs[-1]) > 200 else '\n'.join(paragraphs[-2:])
+            item['text'] = '\n'.join(paragraphs)
         item['screenshots'] = len(response.xpath('//div[@id="gallery"]/img').extract())
         
         evaluation = response.xpath('//section[@class="evaluation-of-game"]/div')
@@ -65,5 +93,6 @@ class ReviewsSpider(Spider):
         item['bitterness'] = int(emotions.xpath('//span[contains(@class, "gm-btn__emotion-rating-bitterness")]/following-sibling::span/span/text()').extract_first() or 0)
         item['interest'] = int(emotions.xpath('//span[contains(@class, "gm-btn__emotion-rating-interest")]/following-sibling::span/span/text()').extract_first() or 0)
         item['poker'] = int(emotions.xpath('//span[contains(@class, "gm-btn__emotion-rating-poker")]/following-sibling::span/span/text()').extract_first() or 0)
+        item['url'] = response.url
 
         yield item
