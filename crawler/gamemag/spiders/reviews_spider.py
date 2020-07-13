@@ -41,19 +41,46 @@ class ReviewsSpider(Spider):
         
         HTML_RE = re.compile(r'<[^>]+>')
         paragraphs = list(filter(lambda x: x.strip() and not x.startswith(("Тестировалась версия для",
+                                                                           "Тестировались версии для",
+                                                                           "Игра тестировалась на",
+                                                                           "Автор проходил игру на",
+                                                                           "Автор играл на",
                                                                            "Версия для",
+                                                                           "Версия игры -",
+                                                                           "Автор XTR",
                                                                            "Автор -",
                                                                            " Автор -",
                                                                            "Автор –",
                                                                            "АВТОР –",
                                                                            "АВТОР -",
                                                                            "Автор:",
+                                                                           "Автор;",
                                                                            "Автор обзора -",
                                                                            "Авторы -",
+                                                                           "Авторы –",
+                                                                           "Авторы:",
                                                                            "Редактор -",
+                                                                           "Редактор –",
+                                                                           "Редактор:",
+                                                                           "Редактирование -",
                                                                            "Обзор на дополнения:",
+                                                                           "Author -",
+                                                                           "Автор от оценки воздержался",
+                                                                           "Обзор на PC версию",
                                                                            "***",
-                                                                           "Игра пройдена на")),
+                                                                           "Video Games |",
+                                                                           "*компания создана несколькими",
+                                                                           "Остальные скриншоты",
+                                                                           "Спасибо магазину Gamezone",
+                                                                           "Благодарим компанию NVIDIA",
+                                                                           "P.S. ",
+                                                                           "PS:",
+                                                                           "игра также поступит в продажу",
+                                                                           "Скриншоты в ",
+                                                                           "Вымучено на ",
+                                                                           "Пройдено на ",
+                                                                           "Игра пройдена на",
+                                                                           "Игра не пройдена на")),
                                             [HTML_RE.sub('', item.strip().replace('\n', '')
                                                                          .replace('\r', '')
                                                                          .replace('\xa0', ' ')
@@ -65,16 +92,34 @@ class ReviewsSpider(Spider):
                                             if "Style Definitions" not in item
                                                 and "MicrosoftInternetExplorer4" not in item]))
         if item['title'] == "Halo: The Master Chief Collection":
-            item['verdict'] = paragraphs[-14]
-            item['text'] = '\n'.join(paragraphs[:-13])
+            item['verdict'] = paragraphs[-12]
+            item['text'] = '\n'.join(paragraphs[:-11])
         elif item['title'] == "Hyper Light Drifter":
             item['verdict'] = paragraphs[-5]
             item['text'] = '\n'.join(paragraphs[:-4])
         elif item['title'] == "Pollen":
             item['verdict'] = paragraphs[-4]
-            item['text'] = '\n'.join(paragraphs[:-3])            
+            item['text'] = '\n'.join(paragraphs[:-3])
+        elif item['title'] == "The Solus Project":
+            item['verdict'] = paragraphs[-3]
+            item['text'] = '\n'.join(paragraphs[:-2])
+        elif item['title'] == "The Walking Dead: The Telltale Series - A New Frontier Episode 2: Ties That Bind Part Two":
+            item['verdict'] = paragraphs[-6]
+            item['text'] = '\n'.join(paragraphs[:-5])
+        elif item['title'] == "Minecraft: Story Mode - Episode 1 - The Order of the Stone":
+            item['verdict'] = paragraphs[-3]
+            item['text'] = '\n'.join(paragraphs[:-2])            
+        elif item['title'] == "Ni-Oh":
+            item['verdict'] = paragraphs[-4]
+            item['text'] = '\n'.join(paragraphs[:-3])
+        elif item['title'] == "Puzzle & Dragons Z + Super Mario Bros. Edition":
+            item['verdict'] = ' '.join(paragraphs[-2:])
+            item['text'] = '\n'.join(paragraphs)
+        elif item['title'] == "EA Sports MMA":
+            item['verdict'] = ' '.join(paragraphs[-2:])
+            item['text'] = '\n'.join(paragraphs)            
         else:
-            item['verdict'] = paragraphs[-1] if len(paragraphs[-1]) > 200 else '\n'.join(paragraphs[-2:])
+            item['verdict'] = paragraphs[-1] if len(paragraphs[-1]) > 200 else ' '.join(paragraphs[-2:])
             item['text'] = '\n'.join(paragraphs)
         item['screenshots'] = len(response.xpath('//div[@id="gallery"]/img').extract())
         
